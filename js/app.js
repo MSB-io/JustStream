@@ -1,5 +1,5 @@
 // Global Constants
-const TMDB_API_KEY = 'YOUR_TMDB_API_KEY'; // Replace with your actual TMDb API key
+const TMDB_API_KEY = '89bad794299700cf6fbe8a11164afcb1'; // Replace with your actual TMDb API key
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const VIDSRC_BASE_URL = 'https://vidsrc.to/embed';
