@@ -34,35 +34,6 @@ let availableMovieGenres = [];
 let availableTVGenres = [];
 let availableLanguages = [];
 
-// Create decorative elements
-function createDecorativeElements() {
-    // Create random gradient circles in the background
-    const colors = [
-        'rgba(0, 85, 255, 0.05)',
-        'rgba(94, 23, 235, 0.05)',
-        'rgba(0, 85, 255, 0.08)',
-        'rgba(94, 23, 235, 0.08)'
-    ];
-    
-    const positions = [
-        { top: '10%', left: '5%', size: '300px' },
-        { top: '60%', left: '85%', size: '250px' },
-        { top: '30%', left: '80%', size: '200px' },
-        { top: '80%', left: '15%', size: '350px' }
-    ];
-    
-    for (let i = 0; i < 4; i++) {
-        const circle = document.createElement('div');
-        circle.classList.add('gradient-circle');
-        circle.style.top = positions[i].top;
-        circle.style.left = positions[i].left;
-        circle.style.width = positions[i].size;
-        circle.style.height = positions[i].size;
-        circle.style.background = colors[i];
-        document.body.appendChild(circle);
-    }
-}
-
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initApp);
 logoElement.addEventListener('click', () => showSection('home'));
@@ -78,9 +49,6 @@ tvFilterResetBtn.addEventListener('click', resetTVFilters);
 function initApp() {
     // Set document title
     document.title = 'JustStream - Watch Movies & TV Shows';
-    
-    // Create decorative elements
-    createDecorativeElements();
     
     // Set up navigation
     navItems.forEach(item => {
@@ -110,39 +78,21 @@ function initApp() {
 // Content Loading Functions
 async function loadTrendingContent() {
     try {
-        // Show loading state
-        const trendingContainer = document.getElementById('trending-content');
-        // Loader already in the HTML
-        
         const response = await fetch(`${TMDB_BASE_URL}/trending/all/day?api_key=${TMDB_API_KEY}`);
         const data = await response.json();
         
-        if (data.results && data.results.length > 0) {
+        if (data.results) {
             renderContentGrid('trending-content', data.results);
-        } else {
-            trendingContainer.innerHTML = `
-                <div class="no-results">
-                    <i class="fas fa-film"></i>
-                    <p>No trending content found.</p>
-                </div>
-            `;
         }
     } catch (error) {
         console.error('Error loading trending content:', error);
-        document.getElementById('trending-content').innerHTML = `
-            <div class="no-results">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>Error loading content. Please try again.</p>
-            </div>
-        `;
     }
 }
 
 async function loadMoviesContent() {
     try {
         // Show loading state
-        const moviesContainer = document.getElementById('movies-content');
-        // Loader already in the HTML
+        document.getElementById('movies-content').innerHTML = '<p>Loading content...</p>';
         
         // Build query parameters
         let url = `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&sort_by=popularity.desc`;
@@ -166,33 +116,18 @@ async function loadMoviesContent() {
         const response = await fetch(url);
         const data = await response.json();
         
-        if (data.results && data.results.length > 0) {
+        if (data.results) {
             renderContentGrid('movies-content', data.results, 'movie');
-        } else {
-            moviesContainer.innerHTML = `
-                <div class="no-results">
-                    <i class="fas fa-film"></i>
-                    <p>No movies found with the selected filters.</p>
-                    <button class="btn btn-secondary" onclick="resetMovieFilters()">Reset Filters</button>
-                </div>
-            `;
         }
     } catch (error) {
         console.error('Error loading movie content:', error);
-        document.getElementById('movies-content').innerHTML = `
-            <div class="no-results">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>Error loading content. Please try again.</p>
-            </div>
-        `;
     }
 }
 
 async function loadTVContent() {
     try {
         // Show loading state
-        const tvContainer = document.getElementById('tv-content');
-        // Loader already in the HTML
+        document.getElementById('tv-content').innerHTML = '<p>Loading content...</p>';
         
         // Build query parameters
         let url = `${TMDB_BASE_URL}/discover/tv?api_key=${TMDB_API_KEY}&sort_by=popularity.desc`;
@@ -216,25 +151,11 @@ async function loadTVContent() {
         const response = await fetch(url);
         const data = await response.json();
         
-        if (data.results && data.results.length > 0) {
+        if (data.results) {
             renderContentGrid('tv-content', data.results, 'tv');
-        } else {
-            tvContainer.innerHTML = `
-                <div class="no-results">
-                    <i class="fas fa-tv"></i>
-                    <p>No TV shows found with the selected filters.</p>
-                    <button class="btn btn-secondary" onclick="resetTVFilters()">Reset Filters</button>
-                </div>
-            `;
         }
     } catch (error) {
         console.error('Error loading TV content:', error);
-        document.getElementById('tv-content').innerHTML = `
-            <div class="no-results">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>Error loading content. Please try again.</p>
-            </div>
-        `;
     }
 }
 
@@ -395,63 +316,31 @@ function renderContentGrid(containerId, items, forcedType = null) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     
-    // Add stagger delay for animation
-    let delay = 0;
-    const delayIncrement = 50; // ms
-    
     items.forEach(item => {
         const contentType = forcedType || (item.media_type || (item.first_air_date ? 'tv' : 'movie'));
         const title = item.title || item.name || 'Untitled';
         const posterPath = item.poster_path 
             ? `${TMDB_IMAGE_BASE_URL}${item.poster_path}`
             : 'https://via.placeholder.com/300x450?text=No+Poster';
-        const year = item.release_date || item.first_air_date
-            ? new Date(item.release_date || item.first_air_date).getFullYear()
-            : '';
-        const rating = item.vote_average ? item.vote_average.toFixed(1) : null;
             
         const contentCard = document.createElement('div');
         contentCard.className = 'content-card';
         contentCard.dataset.id = item.id;
         contentCard.dataset.type = contentType;
-        contentCard.style.opacity = '0';
-        contentCard.style.transform = 'translateY(20px)';
-        contentCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        contentCard.style.transitionDelay = `${delay}ms`;
-        
-        let ratingHTML = '';
-        if (rating) {
-            ratingHTML = `
-                <div class="content-rating">
-                    <i class="fas fa-star"></i> ${rating}
-                </div>
-            `;
-        }
         
         contentCard.innerHTML = `
             <img src="${posterPath}" alt="${title}" class="content-poster">
-            ${ratingHTML}
             <div class="content-info">
                 <h3 class="content-title">${title}</h3>
                 <div class="content-type">
                     <i class="fas ${contentType === 'movie' ? 'fa-film' : 'fa-tv'}"></i>
                     ${contentType === 'movie' ? 'Movie' : 'TV Show'}
-                    ${year ? `<span class="content-year">${year}</span>` : ''}
                 </div>
             </div>
         `;
         
         contentCard.addEventListener('click', () => openDetailsModal(item.id, contentType));
         container.appendChild(contentCard);
-        
-        // Trigger animation after a small delay
-        setTimeout(() => {
-            contentCard.style.opacity = '1';
-            contentCard.style.transform = 'translateY(0)';
-        }, 10);
-        
-        // Increment delay for the next card
-        delay += delayIncrement;
     });
 }
 
@@ -475,41 +364,29 @@ function showSection(sectionName) {
             section.classList.add('hidden-section');
         }
     });
-    
-    // Scroll to top
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
 }
 
 function openDetailsModal(contentId, type) {
     currentContentType = type;
     
     // Reset modal content
-    document.getElementById('content-details').innerHTML = `
-        <div class="loader"></div>
-        <div class="loading-text">Loading details...</div>
-    `;
+    document.getElementById('content-details').innerHTML = '';
     document.getElementById('player-container').innerHTML = '';
     
-    // Display modal with animation
-    detailsModal.style.display = 'block';
-    detailsModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    // Show loading state
+    document.getElementById('content-details').innerHTML = '<p>Loading content details...</p>';
     
     // Load content details
     loadContentDetails(contentId, type);
+    
+    // Display modal
+    detailsModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
 }
 
 function closeDetailsModal() {
-    detailsModal.classList.remove('active');
-    
-    // Delay hiding the modal to complete the fade-out animation
-    setTimeout(() => {
-        detailsModal.style.display = 'none';
-        document.body.style.overflow = '';
-    }, 300);
+    detailsModal.style.display = 'none';
+    document.body.style.overflow = '';
 }
 
 // Helper Functions
@@ -522,18 +399,4 @@ window.addEventListener('click', (event) => {
     if (event.target === detailsModal) {
         closeDetailsModal();
     }
-});
-
-// Add smooth scrolling for internal links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            window.scrollTo({
-                top: target.offsetTop,
-                behavior: 'smooth'
-            });
-        }
-    });
 });

@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Background gradients -->
-    <div class="bg-gradient"></div>
-    
     <header>
         <div class="logo">
             <h1>JustStream</h1>
@@ -33,11 +30,7 @@
         <!-- Home Section -->
         <section id="home-section" class="active-section">
             <h2>Trending Now</h2>
-            <div class="content-grid" id="trending-content">
-                <!-- Placeholder for loading state -->
-                <div class="loader"></div>
-                <div class="loading-text">Loading trending content...</div>
-            </div>
+            <div class="content-grid" id="trending-content"></div>
         </section>
 
         <!-- Movies Section -->
@@ -75,19 +68,11 @@
                     </select>
                 </div>
                 <div class="filter-buttons">
-                    <button id="movie-filter-apply" class="filter-apply-btn">
-                        <i class="fas fa-filter"></i> Apply Filters
-                    </button>
-                    <button id="movie-filter-reset" class="filter-reset-btn">
-                        <i class="fas fa-undo"></i> Reset
-                    </button>
+                    <button id="movie-filter-apply" class="filter-apply-btn">Apply Filters</button>
+                    <button id="movie-filter-reset" class="filter-reset-btn">Reset</button>
                 </div>
             </div>
-            <div class="content-grid" id="movies-content">
-                <!-- Placeholder for loading state -->
-                <div class="loader"></div>
-                <div class="loading-text">Loading movies...</div>
-            </div>
+            <div class="content-grid" id="movies-content"></div>
         </section>
 
         <!-- TV Shows Section -->
@@ -125,19 +110,11 @@
                     </select>
                 </div>
                 <div class="filter-buttons">
-                    <button id="tv-filter-apply" class="filter-apply-btn">
-                        <i class="fas fa-filter"></i> Apply Filters
-                    </button>
-                    <button id="tv-filter-reset" class="filter-reset-btn">
-                        <i class="fas fa-undo"></i> Reset
-                    </button>
+                    <button id="tv-filter-apply" class="filter-apply-btn">Apply Filters</button>
+                    <button id="tv-filter-reset" class="filter-reset-btn">Reset</button>
                 </div>
             </div>
-            <div class="content-grid" id="tv-content">
-                <!-- Placeholder for loading state -->
-                <div class="loader"></div>
-                <div class="loading-text">Loading TV shows...</div>
-            </div>
+            <div class="content-grid" id="tv-content"></div>
         </section>
 
         <!-- Search Results Section -->
@@ -151,11 +128,7 @@
     <div id="details-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
         <div class="modal-content">
             <span class="close-modal" aria-label="Close">&times;</span>
-            <div id="content-details">
-                <!-- Content will be inserted here via JavaScript -->
-                <div class="loader"></div>
-                <div class="loading-text">Loading details...</div>
-            </div>
+            <div id="content-details"></div>
             <div id="player-container"></div>
         </div>
     </div>
