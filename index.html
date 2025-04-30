@@ -12,7 +12,7 @@
         <div class="logo">
             <h1>JustStream</h1>
         </div>
-        <nav>
+        <nav aria-label="Main navigation">
             <ul>
                 <li><a href="#" class="active" data-section="home">Home</a></li>
                 <li><a href="#" data-section="movies">Movies</a></li>
@@ -20,13 +20,13 @@
             </ul>
         </nav>
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search movies or TV shows...">
-            <button id="search-button"><i class="fas fa-search"></i></button>
-            <div id="search-autocomplete" class="autocomplete-results"></div>
+            <input type="text" id="search-input" placeholder="Search movies or TV shows..." aria-label="Search movies or TV shows">
+            <button id="search-button" aria-label="Search"><i class="fas fa-search"></i></button>
+            <div id="search-autocomplete" class="autocomplete-results" role="listbox"></div>
         </div>
     </header>
 
-    <main>
+    <main class="container">
         <!-- Home Section -->
         <section id="home-section" class="active-section">
             <h2>Trending Now</h2>
@@ -38,28 +38,28 @@
             <h2>Popular Movies</h2>
             <div class="filters-container">
                 <div class="filter-group">
-                    <label>Genre:</label>
+                    <label for="movie-genre-filter">Genre:</label>
                     <select id="movie-genre-filter" class="filter-select">
                         <option value="">All Genres</option>
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Year:</label>
+                    <label for="movie-year-filter">Year:</label>
                     <select id="movie-year-filter" class="filter-select">
                         <option value="">All Years</option>
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Language:</label>
+                    <label for="movie-language-filter">Language:</label>
                     <select id="movie-language-filter" class="filter-select">
                         <option value="">All Languages</option>
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Rating:</label>
+                    <label for="movie-rating-filter">Rating:</label>
                     <select id="movie-rating-filter" class="filter-select">
                         <option value="">All Ratings</option>
                         <option value="7">7+ Stars</option>
@@ -67,8 +67,10 @@
                         <option value="9">9+ Stars</option>
                     </select>
                 </div>
-                <button id="movie-filter-apply" class="filter-apply-btn">Apply Filters</button>
-                <button id="movie-filter-reset" class="filter-reset-btn">Reset</button>
+                <div class="filter-buttons">
+                    <button id="movie-filter-apply" class="filter-apply-btn">Apply Filters</button>
+                    <button id="movie-filter-reset" class="filter-reset-btn">Reset</button>
+                </div>
             </div>
             <div class="content-grid" id="movies-content"></div>
         </section>
@@ -78,28 +80,28 @@
             <h2>Popular TV Shows</h2>
             <div class="filters-container">
                 <div class="filter-group">
-                    <label>Genre:</label>
+                    <label for="tv-genre-filter">Genre:</label>
                     <select id="tv-genre-filter" class="filter-select">
                         <option value="">All Genres</option>
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Year:</label>
+                    <label for="tv-year-filter">Year:</label>
                     <select id="tv-year-filter" class="filter-select">
                         <option value="">All Years</option>
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Language:</label>
+                    <label for="tv-language-filter">Language:</label>
                     <select id="tv-language-filter" class="filter-select">
                         <option value="">All Languages</option>
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Rating:</label>
+                    <label for="tv-rating-filter">Rating:</label>
                     <select id="tv-rating-filter" class="filter-select">
                         <option value="">All Ratings</option>
                         <option value="7">7+ Stars</option>
@@ -107,8 +109,10 @@
                         <option value="9">9+ Stars</option>
                     </select>
                 </div>
-                <button id="tv-filter-apply" class="filter-apply-btn">Apply Filters</button>
-                <button id="tv-filter-reset" class="filter-reset-btn">Reset</button>
+                <div class="filter-buttons">
+                    <button id="tv-filter-apply" class="filter-apply-btn">Apply Filters</button>
+                    <button id="tv-filter-reset" class="filter-reset-btn">Reset</button>
+                </div>
             </div>
             <div class="content-grid" id="tv-content"></div>
         </section>
@@ -121,16 +125,18 @@
     </main>
 
     <!-- Content Details Modal -->
-    <div id="details-modal" class="modal">
+    <div id="details-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <span class="close-modal" aria-label="Close">&times;</span>
             <div id="content-details"></div>
             <div id="player-container"></div>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2025 JustStream. Powered by TMDb and Vidsrc.</p>
+        <div class="container">
+            <p>&copy; 2025 JustStream. Powered by TMDb and Vidsrc.</p>
+        </div>
     </footer>
     
     <script src="js/app.js"></script>
