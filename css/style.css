@@ -6,12 +6,21 @@
 }
 
 :root {
-    /* Colors */
-    --primary-color: #0f171e;
-    --secondary-color: #1a242f;
-    --accent-color: #3498db;
-    --text-color: #fff;
-    --gray-text: #8197a4;
+    /* Colors - Updated with AMOLED black and Framer-inspired palette */
+    --primary-color: #000000; /* AMOLED pure black for battery saving */
+    --secondary-color: #111111; /* Very dark gray, nearly black */
+    --accent-color: #0055FF; /* Vibrant blue similar to Framer */
+    --accent-secondary: #5E17EB; /* Purple accent for variety */
+    --accent-gradient: linear-gradient(135deg, #0055FF, #5E17EB);
+    --text-color: #FFFFFF;
+    --text-color-muted: rgba(255, 255, 255, 0.75);
+    --gray-text: #9BA1A6;
+    --card-bg: #111111;
+    --card-highlight: #1A1A1A;
+    --input-bg: #1A1A1A;
+    --error-color: #FF5252;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
     
     /* Spacing System */
     --space-xs: 0.25rem;
@@ -28,7 +37,7 @@
     --radius-xl: 1.5rem;
     
     /* Typography */
-    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-main: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-size-xs: 0.75rem;  /* 12px */
     --font-size-sm: 0.875rem; /* 14px */
     --font-size-md: 1rem;     /* 16px */
@@ -92,14 +101,20 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .logo h1 {
-    color: var(--accent-color);
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     font-size: var(--font-size-xl);
+    font-weight: 700;
     cursor: pointer;
     margin-bottom: var(--space-md);
+    letter-spacing: -0.5px;
 }
 
 nav {
@@ -121,11 +136,24 @@ nav ul li a {
     color: var(--gray-text);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s;
+    transition: all 0.3s ease;
+    position: relative;
+    padding-bottom: 3px;
 }
 
 nav ul li a.active, nav ul li a:hover {
-    color: var(--accent-color);
+    color: var(--text-color);
+}
+
+nav ul li a.active:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-sm);
 }
 
 .search-container {
@@ -137,27 +165,34 @@ nav ul li a.active, nav ul li a:hover {
 
 #search-input {
     padding: var(--space-sm) var(--space-md);
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-xl) 0 0 var(--radius-xl);
     outline: none;
     width: 100%;
-    background-color: #2c3b47;
+    background-color: var(--input-bg);
     color: var(--text-color);
     font-size: var(--font-size-md);
+    transition: all 0.3s ease;
+}
+
+#search-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 85, 255, 0.2);
 }
 
 #search-button {
-    background-color: var(--accent-color);
+    background: var(--accent-gradient);
     color: var(--text-color);
     border: none;
     border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
     padding: var(--space-sm) var(--space-md);
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
 #search-button:hover {
-    background-color: #0088b6;
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .autocomplete-results {
@@ -170,16 +205,19 @@ nav ul li a.active, nav ul li a:hover {
     max-height: 300px;
     overflow-y: auto;
     z-index: 10;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
     display: none;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: var(--space-xs);
 }
 
 .autocomplete-item {
     padding: var(--space-md);
     cursor: pointer;
-    border-bottom: 1px solid #34495e;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
+    transition: background-color 0.2s ease;
 }
 
 .autocomplete-item:last-child {
@@ -187,7 +225,7 @@ nav ul li a.active, nav ul li a:hover {
 }
 
 .autocomplete-item:hover {
-    background-color: #34495e;
+    background-color: var(--card-highlight);
 }
 
 .autocomplete-item img {
@@ -195,6 +233,8 @@ nav ul li a.active, nav ul li a:hover {
     height: 45px;
     margin-right: var(--space-md);
     border-radius: var(--radius-sm);
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .autocomplete-title {
@@ -216,6 +256,8 @@ nav ul li a.active, nav ul li a:hover {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .filter-group {
@@ -232,12 +274,18 @@ nav ul li a.active, nav ul li a:hover {
 
 .filter-select {
     padding: var(--space-sm) var(--space-md);
-    background-color: #2c3b47;
+    background-color: var(--input-bg);
     color: var(--text-color);
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-md);
     outline: none;
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 85, 255, 0.2);
 }
 
 .filter-buttons {
@@ -252,27 +300,28 @@ nav ul li a.active, nav ul li a:hover {
     border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: 500;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .filter-apply-btn {
-    background-color: var(--accent-color);
+    background: var(--accent-gradient);
     color: var(--text-color);
     flex: 1;
 }
 
 .filter-apply-btn:hover {
-    background-color: #2980b9;
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .filter-reset-btn {
-    background-color: #34495e;
+    background-color: rgba(255, 255, 255, 0.05);
     color: var(--text-color);
     flex: 1;
 }
 
 .filter-reset-btn:hover {
-    background-color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Main Content Styles */
@@ -284,9 +333,23 @@ main {
 
 main h2 {
     margin-bottom: var(--space-xl);
-    font-weight: 500;
-    color: var(--accent-color);
+    font-weight: 600;
+    color: var(--text-color);
     font-size: var(--font-size-lg);
+    position: relative;
+    display: inline-block;
+    padding-bottom: var(--space-xs);
+}
+
+main h2:after {
+    content: '';
+    position: absolute;
+    height: 3px;
+    width: 40px;
+    background: var(--accent-gradient);
+    bottom: 0;
+    left: 0;
+    border-radius: var(--radius-sm);
 }
 
 .content-grid {
@@ -296,27 +359,53 @@ main h2 {
 }
 
 .content-card {
-    background-color: var(--secondary-color);
+    background-color: var(--card-bg);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .content-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    border-color: var(--accent-color);
+}
+
+.content-card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-gradient);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.content-card:hover:before {
+    opacity: 1;
 }
 
 .content-poster {
     width: 100%;
     height: 210px;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.content-card:hover .content-poster {
+    transform: scale(1.05);
 }
 
 .content-info {
     padding: var(--space-md);
+    position: relative;
+    background: var(--card-bg);
 }
 
 .content-title {
@@ -338,6 +427,7 @@ main h2 {
 .content-type i {
     margin-right: var(--space-xs);
     font-size: var(--font-size-xs);
+    color: var(--accent-color);
 }
 
 /* Section Display */
@@ -358,8 +448,9 @@ main h2 {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
     overflow-y: auto;
+    backdrop-filter: blur(5px);
 }
 
 .modal-content {
@@ -370,6 +461,8 @@ main h2 {
     max-width: 1000px;
     border-radius: var(--radius-lg);
     position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .close-modal {
@@ -381,10 +474,18 @@ main h2 {
     color: var(--gray-text);
     cursor: pointer;
     transition: color 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .close-modal:hover {
-    color: var(--accent-color);
+    color: var(--text-color);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 #content-details {
@@ -402,7 +503,8 @@ main h2 {
     max-width: 100%;
     margin-bottom: var(--space-lg);
     border-radius: var(--radius-lg);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .details-info {
@@ -412,39 +514,76 @@ main h2 {
 .details-title {
     font-size: var(--font-size-xl);
     margin-bottom: var(--space-md);
-    color: var(--accent-color);
+    color: var(--text-color);
+    font-weight: 600;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .details-meta {
     color: var(--gray-text);
     font-size: var(--font-size-sm);
     margin-bottom: var(--space-lg);
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .details-meta span {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     margin-right: var(--space-lg);
     margin-bottom: var(--space-sm);
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+}
+
+.details-meta span i {
+    color: var(--accent-color);
+    margin-right: 5px;
 }
 
 .details-overview {
     margin-bottom: var(--space-lg);
     font-size: var(--font-size-md);
     line-height: 1.6;
+    color: var(--text-color-muted);
 }
 
 #player-container {
     width: 100%;
     margin: 0 auto;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
 }
 
 #player-container iframe {
     border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 /* Season/Episode Selector */
 .season-selector {
     margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+}
+
+.season-selector label {
+    margin-right: var(--space-sm);
+    color: var(--gray-text);
+}
+
+.season-selector select {
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    outline: none;
 }
 
 .episode-grid {
@@ -456,16 +595,23 @@ main h2 {
 }
 
 .episode-item {
-    background-color: #2c3b47;
+    background-color: var(--input-bg);
     padding: var(--space-sm);
     border-radius: var(--radius-md);
     text-align: center;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .episode-item:hover {
-    background-color: var(--accent-color);
+    background-color: rgba(0, 85, 255, 0.1);
+    border-color: var(--accent-color);
+}
+
+.episode-item.selected {
+    background: var(--accent-gradient);
+    color: white;
 }
 
 /* Footer */
@@ -475,6 +621,8 @@ footer {
     background-color: var(--secondary-color);
     color: var(--gray-text);
     font-size: var(--font-size-sm);
+    margin-top: var(--space-xxl);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 /* Responsive Design - Tablet (576px and up) */
