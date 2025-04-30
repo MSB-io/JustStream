@@ -11,13 +11,39 @@ const logoElement = document.querySelector('.logo');
 const detailsModal = document.getElementById('details-modal');
 const closeModal = document.querySelector('.close-modal');
 
+// Filter Elements
+const movieGenreFilter = document.getElementById('movie-genre-filter');
+const movieYearFilter = document.getElementById('movie-year-filter');
+const movieLanguageFilter = document.getElementById('movie-language-filter');
+const movieRatingFilter = document.getElementById('movie-rating-filter');
+const movieFilterApplyBtn = document.getElementById('movie-filter-apply');
+const movieFilterResetBtn = document.getElementById('movie-filter-reset');
+
+const tvGenreFilter = document.getElementById('tv-genre-filter');
+const tvYearFilter = document.getElementById('tv-year-filter');
+const tvLanguageFilter = document.getElementById('tv-language-filter');
+const tvRatingFilter = document.getElementById('tv-rating-filter');
+const tvFilterApplyBtn = document.getElementById('tv-filter-apply');
+const tvFilterResetBtn = document.getElementById('tv-filter-reset');
+
 // Current State
 let currentContentType = 'movie';
+let movieFilters = { genre: '', year: '', language: '', rating: '' };
+let tvFilters = { genre: '', year: '', language: '', rating: '' };
+let availableMovieGenres = [];
+let availableTVGenres = [];
+let availableLanguages = [];
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initApp);
 logoElement.addEventListener('click', () => showSection('home'));
 closeModal.addEventListener('click', closeDetailsModal);
+
+// Filter Event Listeners
+movieFilterApplyBtn.addEventListener('click', applyMovieFilters);
+movieFilterResetBtn.addEventListener('click', resetMovieFilters);
+tvFilterApplyBtn.addEventListener('click', applyTVFilters);
+tvFilterResetBtn.addEventListener('click', resetTVFilters);
 
 // Initialize Application
 function initApp() {
@@ -34,6 +60,17 @@ function initApp() {
 
     // Load initial content
     loadTrendingContent();
+    
+    // Load available filters
+    loadGenres();
+    loadLanguages();
+    populateYearFilters();
+
+    // Set default filters
+    movieFilters = { genre: '', year: '', language: '', rating: '' };
+    tvFilters = { genre: '', year: '', language: '', rating: '' };
+    
+    // Load content with default filters
     loadMoviesContent();
     loadTVContent();
 }
@@ -54,7 +91,29 @@ async function loadTrendingContent() {
 
 async function loadMoviesContent() {
     try {
-        const response = await fetch(`${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}`);
+        // Show loading state
+        document.getElementById('movies-content').innerHTML = '<p>Loading content...</p>';
+        
+        // Build query parameters
+        let url = `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&sort_by=popularity.desc`;
+        
+        if (movieFilters.genre) {
+            url += `&with_genres=${movieFilters.genre}`;
+        }
+        
+        if (movieFilters.year) {
+            url += `&primary_release_year=${movieFilters.year}`;
+        }
+        
+        if (movieFilters.language) {
+            url += `&with_original_language=${movieFilters.language}`;
+        }
+        
+        if (movieFilters.rating) {
+            url += `&vote_average.gte=${movieFilters.rating}`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         if (data.results) {
@@ -67,7 +126,29 @@ async function loadMoviesContent() {
 
 async function loadTVContent() {
     try {
-        const response = await fetch(`${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}`);
+        // Show loading state
+        document.getElementById('tv-content').innerHTML = '<p>Loading content...</p>';
+        
+        // Build query parameters
+        let url = `${TMDB_BASE_URL}/discover/tv?api_key=${TMDB_API_KEY}&sort_by=popularity.desc`;
+        
+        if (tvFilters.genre) {
+            url += `&with_genres=${tvFilters.genre}`;
+        }
+        
+        if (tvFilters.year) {
+            url += `&first_air_date_year=${tvFilters.year}`;
+        }
+        
+        if (tvFilters.language) {
+            url += `&with_original_language=${tvFilters.language}`;
+        }
+        
+        if (tvFilters.rating) {
+            url += `&vote_average.gte=${tvFilters.rating}`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         if (data.results) {
@@ -76,6 +157,158 @@ async function loadTVContent() {
     } catch (error) {
         console.error('Error loading TV content:', error);
     }
+}
+
+// Filter Functions
+async function loadGenres() {
+    try {
+        // Load movie genres
+        const movieGenresResponse = await fetch(`${TMDB_BASE_URL}/genre/movie/list?api_key=${TMDB_API_KEY}`);
+        const movieGenresData = await movieGenresResponse.json();
+        
+        if (movieGenresData.genres) {
+            availableMovieGenres = movieGenresData.genres;
+            populateGenreFilter(movieGenreFilter, availableMovieGenres);
+        }
+        
+        // Load TV genres
+        const tvGenresResponse = await fetch(`${TMDB_BASE_URL}/genre/tv/list?api_key=${TMDB_API_KEY}`);
+        const tvGenresData = await tvGenresResponse.json();
+        
+        if (tvGenresData.genres) {
+            availableTVGenres = tvGenresData.genres;
+            populateGenreFilter(tvGenreFilter, availableTVGenres);
+        }
+    } catch (error) {
+        console.error('Error loading genres:', error);
+    }
+}
+
+async function loadLanguages() {
+    try {
+        const response = await fetch(`${TMDB_BASE_URL}/configuration/languages?api_key=${TMDB_API_KEY}`);
+        const languages = await response.json();
+        
+        if (languages) {
+            availableLanguages = languages;
+            populateLanguageFilters(languages);
+        }
+    } catch (error) {
+        console.error('Error loading languages:', error);
+    }
+}
+
+function populateGenreFilter(selectElement, genres) {
+    genres.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre.id;
+        option.textContent = genre.name;
+        selectElement.appendChild(option);
+    });
+}
+
+function populateLanguageFilters(languages) {
+    // Sort languages by English name
+    languages.sort((a, b) => a.english_name.localeCompare(b.english_name));
+    
+    // Get the major languages first
+    const majorLanguages = ['en', 'es', 'fr', 'de', 'ja', 'ko', 'zh', 'hi', 'ru'];
+    
+    // Add major languages first
+    majorLanguages.forEach(code => {
+        const language = languages.find(lang => lang.iso_639_1 === code);
+        if (language) {
+            addLanguageOption(movieLanguageFilter, language);
+            addLanguageOption(tvLanguageFilter, language);
+        }
+    });
+    
+    // Add a separator
+    const movieSeparator = document.createElement('option');
+    movieSeparator.disabled = true;
+    movieSeparator.textContent = '──────────';
+    movieLanguageFilter.appendChild(movieSeparator);
+    
+    const tvSeparator = document.createElement('option');
+    tvSeparator.disabled = true;
+    tvSeparator.textContent = '──────────';
+    tvLanguageFilter.appendChild(tvSeparator);
+    
+    // Add all other languages
+    languages.forEach(language => {
+        if (!majorLanguages.includes(language.iso_639_1)) {
+            addLanguageOption(movieLanguageFilter, language);
+            addLanguageOption(tvLanguageFilter, language);
+        }
+    });
+}
+
+function addLanguageOption(selectElement, language) {
+    const option = document.createElement('option');
+    option.value = language.iso_639_1;
+    option.textContent = language.english_name;
+    selectElement.appendChild(option);
+}
+
+function populateYearFilters() {
+    const currentYear = new Date().getFullYear();
+    
+    // Populate years from current year down to 1900
+    for (let year = currentYear; year >= 1900; year--) {
+        addYearOption(movieYearFilter, year);
+        addYearOption(tvYearFilter, year);
+    }
+}
+
+function addYearOption(selectElement, year) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    selectElement.appendChild(option);
+}
+
+function applyMovieFilters() {
+    movieFilters = {
+        genre: movieGenreFilter.value,
+        year: movieYearFilter.value,
+        language: movieLanguageFilter.value,
+        rating: movieRatingFilter.value
+    };
+    
+    loadMoviesContent();
+}
+
+function resetMovieFilters() {
+    movieGenreFilter.value = '';
+    movieYearFilter.value = '';
+    movieLanguageFilter.value = '';
+    movieRatingFilter.value = '';
+    
+    movieFilters = { genre: '', year: '', language: '', rating: '' };
+    
+    loadMoviesContent();
+}
+
+function applyTVFilters() {
+    tvFilters = {
+        genre: tvGenreFilter.value,
+        year: tvYearFilter.value,
+        language: tvLanguageFilter.value,
+        rating: tvRatingFilter.value
+    };
+    
+    loadTVContent();
+}
+
+function resetTVFilters() {
+    tvGenreFilter.value = '';
+    tvYearFilter.value = '';
+    tvLanguageFilter.value = '';
+    tvRatingFilter.value = '';
+    
+    tvFilters = { genre: '', year: '', language: '', rating: '' };
+    
+    loadTVContent();
 }
 
 // UI Functions

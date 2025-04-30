@@ -22,6 +22,7 @@
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Search movies or TV shows...">
             <button id="search-button"><i class="fas fa-search"></i></button>
+            <div id="search-autocomplete" class="autocomplete-results"></div>
         </div>
     </header>
 
@@ -35,12 +36,80 @@
         <!-- Movies Section -->
         <section id="movies-section" class="hidden-section">
             <h2>Popular Movies</h2>
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label>Genre:</label>
+                    <select id="movie-genre-filter" class="filter-select">
+                        <option value="">All Genres</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Year:</label>
+                    <select id="movie-year-filter" class="filter-select">
+                        <option value="">All Years</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Language:</label>
+                    <select id="movie-language-filter" class="filter-select">
+                        <option value="">All Languages</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Rating:</label>
+                    <select id="movie-rating-filter" class="filter-select">
+                        <option value="">All Ratings</option>
+                        <option value="7">7+ Stars</option>
+                        <option value="8">8+ Stars</option>
+                        <option value="9">9+ Stars</option>
+                    </select>
+                </div>
+                <button id="movie-filter-apply" class="filter-apply-btn">Apply Filters</button>
+                <button id="movie-filter-reset" class="filter-reset-btn">Reset</button>
+            </div>
             <div class="content-grid" id="movies-content"></div>
         </section>
 
         <!-- TV Shows Section -->
         <section id="tv-section" class="hidden-section">
             <h2>Popular TV Shows</h2>
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label>Genre:</label>
+                    <select id="tv-genre-filter" class="filter-select">
+                        <option value="">All Genres</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Year:</label>
+                    <select id="tv-year-filter" class="filter-select">
+                        <option value="">All Years</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Language:</label>
+                    <select id="tv-language-filter" class="filter-select">
+                        <option value="">All Languages</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Rating:</label>
+                    <select id="tv-rating-filter" class="filter-select">
+                        <option value="">All Ratings</option>
+                        <option value="7">7+ Stars</option>
+                        <option value="8">8+ Stars</option>
+                        <option value="9">9+ Stars</option>
+                    </select>
+                </div>
+                <button id="tv-filter-apply" class="filter-apply-btn">Apply Filters</button>
+                <button id="tv-filter-reset" class="filter-reset-btn">Reset</button>
+            </div>
             <div class="content-grid" id="tv-content"></div>
         </section>
 
