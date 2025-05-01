@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JustStream - Free Online Streaming</title>
+    <title>Watch - JustStream</title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/responsive.css">
 </head>
-<body>
+<body class="watch-page">
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-inner">
@@ -22,7 +22,7 @@
                     <span class="bar"></span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="index.html">Home</a></li>
                     <li><a href="movies.html">Movies</a></li>
                     <li><a href="tvshows.html">TV Shows</a></li>
                     <li class="search-container">
@@ -34,31 +34,38 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Trending Movies Section -->
-        <section class="content-section">
-            <h2 class="section-title">Trending Movies</h2>
-            <div class="media-scroll" id="trending-movies">
-                <!-- Movie cards will be dynamically inserted here -->
+    <!-- Watch Content -->
+    <main class="watch-container">
+        <div class="watch-header">
+            <a href="#" id="back-button" class="back-button">← Back to Details</a>
+            <div class="watch-info">
+                <h1 id="watch-title">Loading...</h1>
+                <div class="watch-meta">
+                    <span id="watch-year">Year</span>
+                    <span class="separator">•</span>
+                    <span id="watch-rating">Rating</span>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Top Rated Movies Section -->
-        <section class="content-section">
-            <h2 class="section-title">Top Rated Movies</h2>
-            <div class="media-scroll" id="top-rated-movies">
-                <!-- Movie cards will be dynamically inserted here -->
+        <!-- Video Player -->
+        <div class="video-container">
+            <div id="player-container">
+                <!-- Video iframe will be inserted here -->
             </div>
-        </section>
+        </div>
 
-        <!-- Popular TV Shows Section -->
-        <section class="content-section">
-            <h2 class="section-title">Popular TV Shows</h2>
-            <div class="media-scroll" id="popular-tvshows">
-                <!-- TV Show cards will be dynamically inserted here -->
+        <!-- TV Show Episodes (Only visible for TV shows) -->
+        <div class="episodes-container" id="episodes-container">
+            <div class="seasons-dropdown">
+                <select id="season-select" class="filter-select">
+                    <!-- Season options will be inserted here -->
+                </select>
             </div>
-        </section>
+            <div class="episodes-list" id="episodes-list">
+                <!-- Episode items will be inserted here -->
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -79,6 +86,6 @@
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="js/ui.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/watch.js"></script>
 </body>
 </html> 

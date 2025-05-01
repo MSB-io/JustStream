@@ -1,0 +1,251 @@
+/* Mobile First Responsive Design */
+
+/* Base Mobile Styles (up to 480px) */
+@media (max-width: 480px) {
+    .navbar {
+        top: var(--spacing-sm);
+    }
+    
+    .navbar-inner, 
+    .footer-inner {
+        width: calc(100% - (var(--spacing-sm) * 2));
+    }
+    
+    body {
+        padding-top: calc(60px + (var(--spacing-sm) * 2));
+    }
+
+    .navbar-container {
+        padding: var(--spacing-sm);
+    }
+
+    .logo a {
+        font-size: 1.5rem;
+    }
+
+    .main-content,
+    .watch-container {
+        padding: var(--spacing-md);
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+    }
+
+    .media-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+
+    .media-card {
+        min-width: 140px;
+    }
+
+    .media-poster {
+        height: 210px;
+    }
+
+    .details-content {
+        padding: var(--spacing-md);
+    }
+
+    .actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+    }
+
+    .episode-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .episode-thumbnail {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .cast-photo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-md);
+    }
+
+    .watch-container {
+        padding: var(--spacing-md);
+    }
+    
+    .watch-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Tablet Styles (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .main-content,
+    .watch-container {
+        padding: var(--spacing-lg);
+    }
+
+    .media-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .details-poster {
+        flex: 0 0 250px;
+    }
+
+    .cast-photo {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* Mobile and Tablet Navigation (up to 1024px) */
+@media (max-width: 1024px) {
+    .menu-toggle {
+        display: block;
+        z-index: 1001;
+    }
+
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 400px;
+        height: 100vh;
+        background-color: var(--extra-dark-gray);
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding-top: 70px;
+        transition: right var(--transition-speed) ease;
+        z-index: 1000;
+        overflow-y: auto;
+        border-radius: 0;
+    }
+
+    .nav-menu.active {
+        right: 0;
+    }
+
+    .nav-menu li {
+        width: 100%;
+        margin: 0;
+        border-bottom: 1px solid var(--dark-gray);
+    }
+
+    .nav-menu a {
+        padding: var(--spacing-md);
+        display: block;
+    }
+
+    .search-container {
+        width: 100%;
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--dark-gray);
+    }
+
+    #search-input {
+        width: calc(100% - 40px);
+    }
+
+    .dropdown-content {
+        position: static;
+        width: 100%;
+        display: none;
+        box-shadow: none;
+        background-color: var(--amoled-black);
+    }
+
+    .dropdown.active .dropdown-content {
+        display: block;
+    }
+
+    .menu-toggle.active .bar:nth-child(1) {
+        transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .menu-toggle.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-toggle.active .bar:nth-child(3) {
+        transform: rotate(45deg) translate(-5px, -6px);
+    }
+}
+
+/* Desktop Styles (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .media-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Larger Desktop Styles (1025px and above) */
+@media (min-width: 1025px) {
+    .media-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    
+    .media-scroll .media-card {
+        flex: 0 0 200px;
+    }
+    
+    .search-container {
+        position: relative;
+    }
+    
+    #search-input {
+        width: 250px;
+    }
+}
+
+/* Small Height Adjustments */
+@media (max-height: 600px) {
+    /* Hero banner height adjustment removed */
+}
+
+/* Dark Mode Detection */
+@media (prefers-color-scheme: dark) {
+    /* Already using dark theme */
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --light-gray: #FFFFFF;
+        --medium-gray: #CCCCCC;
+    }
+    
+    .media-title, .cast-name, .episode-title {
+        color: var(--white);
+    }
+    
+    .media-meta, .cast-character, .episode-overview, .media-rating::before {
+        color: var(--white);
+    }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .media-card:hover {
+        transform: none;
+    }
+} 

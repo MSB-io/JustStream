@@ -1,241 +1,160 @@
-// Search functionality
-const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-const searchAutocomplete = document.getElementById('search-autocomplete');
+/**
+ * JustStream - Search Page Script
+ * Handles search functionality and results display
+ */
 
-// Debounce timer
-let searchTimeout = null;
-const DEBOUNCE_DELAY = 300; // milliseconds to wait before firing search
+// Page state
+const state = {
+    currentPage: 1,
+    totalPages: 0,
+    query: '',
+    filterType: 'all' // 'all', 'movie', or 'tv'
+};
 
-// Event listeners
-searchButton.addEventListener('click', performSearch);
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        performSearch();
-    }
-});
-
-// Add event listener for input to trigger autocomplete
-searchInput.addEventListener('input', handleSearchInput);
-
-// Add click event listener to document to close autocomplete when clicking outside
-document.addEventListener('click', (e) => {
-    if (!searchInput.contains(e.target) && !searchAutocomplete.contains(e.target)) {
-        searchAutocomplete.style.display = 'none';
-    }
-});
-
-// Add keydown event for navigation through autocomplete results
-searchInput.addEventListener('keydown', (e) => {
-    if (!searchAutocomplete.style.display || searchAutocomplete.style.display === 'none') {
-        return;
-    }
-
-    const items = searchAutocomplete.querySelectorAll('.autocomplete-item');
-    if (items.length === 0) return;
-
-    const currentIndex = Array.from(items).findIndex(item => item.classList.contains('selected'));
-
-    switch (e.key) {
-        case 'ArrowDown':
-            e.preventDefault();
-            if (currentIndex < 0 || currentIndex >= items.length - 1) {
-                // Select first item if none selected or at end
-                selectAutocompleteItem(items, 0);
-            } else {
-                // Select next item
-                selectAutocompleteItem(items, currentIndex + 1);
-            }
-            break;
-        case 'ArrowUp':
-            e.preventDefault();
-            if (currentIndex <= 0) {
-                // Select last item if none selected or at beginning
-                selectAutocompleteItem(items, items.length - 1);
-            } else {
-                // Select previous item
-                selectAutocompleteItem(items, currentIndex - 1);
-            }
-            break;
-        case 'Tab':
-        case 'Enter':
-            e.preventDefault();
-            if (currentIndex >= 0) {
-                // Use the selected item
-                const selectedItem = items[currentIndex];
-                searchInput.value = selectedItem.querySelector('.autocomplete-title').textContent;
-                searchAutocomplete.style.display = 'none';
-                
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            }
-            break;
-        case 'Escape':
-            searchAutocomplete.style.display = 'none';
-            break;
-    }
-});
-
-// Search functions
-function handleSearchInput() {
-    const searchQuery = searchInput.value.trim();
-    
-    // Clear any existing timeout
-    if (searchTimeout) {
-        clearTimeout(searchTimeout);
-    }
-    
-    // If empty query, hide autocomplete
-    if (searchQuery.length === 0) {
-        searchAutocomplete.style.display = 'none';
-        return;
-    }
-    
-    // Set new timeout to fetch autocomplete results
-    searchTimeout = setTimeout(() => {
-        fetchAutocompleteResults(searchQuery);
-    }, DEBOUNCE_DELAY);
-}
-
-async function fetchAutocompleteResults(query) {
-    if (query.length < 2) return; // Only search for 2+ characters
-    
+// Function to initialize the search page
+const initSearchPage = async () => {
     try {
-        const response = await fetch(`${TMDB_BASE_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=1`);
-        const data = await response.json();
+        // Get URL parameters
+        const params = uiService.getUrlParams();
         
-        if (data.results && data.results.length > 0) {
-            // Filter out person results and keep only movies and tv shows
-            const filteredResults = data.results
-                .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
-                .slice(0, 8); // Limit to 8 results for autocomplete
-            
-            // Display autocomplete results
-            renderAutocompleteResults(filteredResults, query);
-        } else {
-            // No results found
-            searchAutocomplete.style.display = 'none';
+        // Check if query parameter is present
+        if (!params.query) {
+            throw new Error('No search query provided');
         }
+        
+        // Store query
+        state.query = params.query;
+        
+        // Update query display
+        document.getElementById('search-query').textContent = state.query;
+        
+        // Update page title
+        uiService.setPageTitle(`Search: ${state.query}`);
+        
+        // Set up filter type dropdown
+        setupFilterType();
+        
+        // Perform search
+        await performSearch();
+        
+        // Set up load more button
+        setupLoadMore();
+        
     } catch (error) {
-        console.error('Error fetching autocomplete results:', error);
+        console.error('Error initializing search page:', error);
+        document.querySelector('.media-grid-container').innerHTML = `
+            <div class="error-container">
+                <h2>Error</h2>
+                <p>${error.message || 'Something went wrong. Please try again.'}</p>
+                <a href="index.html" class="btn-primary">Back to Home</a>
+            </div>
+        `;
     }
-}
+};
 
-function renderAutocompleteResults(items, query) {
-    searchAutocomplete.innerHTML = '';
+/**
+ * Set up filter type dropdown
+ */
+const setupFilterType = () => {
+    const filterType = document.getElementById('filter-type');
     
-    if (items.length === 0) {
-        searchAutocomplete.style.display = 'none';
-        return;
+    if (filterType) {
+        // Set initial value from state
+        filterType.value = state.filterType;
+        
+        // Add change event listener
+        filterType.addEventListener('change', async () => {
+            state.filterType = filterType.value;
+            state.currentPage = 1;
+            
+            // Reset and reload search results
+            await performSearch();
+        });
     }
-    
-    items.forEach(item => {
-        const mediaType = item.media_type;
-        const title = item.title || item.name || 'Untitled';
-        const posterPath = item.poster_path 
-            ? `${TMDB_IMAGE_BASE_URL}${item.poster_path}`
-            : 'https://via.placeholder.com/30x45?text=No+Poster';
+};
+
+/**
+ * Perform search based on current state
+ */
+const performSearch = async () => {
+    try {
+        const resultsContainer = document.getElementById('search-results');
+        const noResultsContainer = document.getElementById('no-results');
+        const loadMoreButton = document.getElementById('load-more');
         
-        // Create result item
-        const resultItem = document.createElement('div');
-        resultItem.className = 'autocomplete-item';
-        resultItem.dataset.id = item.id;
-        resultItem.dataset.type = mediaType;
-        
-        // Highlight matching text in the title
-        let highlightedTitle = title;
-        if (query) {
-            const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
-            highlightedTitle = title.replace(regex, '<strong>$1</strong>');
+        // Show loading if it's the first page
+        if (state.currentPage === 1) {
+            uiService.showLoading(resultsContainer);
+            noResultsContainer.style.display = 'none';
         }
         
-        resultItem.innerHTML = `
-            <img src="${posterPath}" alt="${title}">
-            <span class="autocomplete-title">${title}</span>
-            <span class="autocomplete-type">
-                <i class="fas ${mediaType === 'movie' ? 'fa-film' : 'fa-tv'}"></i>
-                ${mediaType === 'movie' ? 'Movie' : 'TV Show'}
-            </span>
-        `;
+        // Perform search based on filter type
+        let searchResults;
         
-        // Add click event to the result item
-        resultItem.addEventListener('click', () => {
-            searchInput.value = title;
-            searchAutocomplete.style.display = 'none';
-            performSearch();
+        if (state.filterType === 'movie') {
+            searchResults = await apiService.searchMovies(state.query, state.currentPage);
+        } else if (state.filterType === 'tv') {
+            searchResults = await apiService.searchTVShows(state.query, state.currentPage);
+        } else {
+            searchResults = await apiService.searchMulti(state.query, state.currentPage);
+        }
+        
+        // Update total pages
+        state.totalPages = searchResults.total_pages;
+        
+        // Clear container if it's the first page
+        if (state.currentPage === 1) {
+            resultsContainer.innerHTML = '';
+        }
+        
+        // Check if there are any results
+        if (searchResults.results.length === 0 && state.currentPage === 1) {
+            noResultsContainer.style.display = 'block';
+            loadMoreButton.style.display = 'none';
+            return;
+        }
+        
+        // Display search results
+        searchResults.results.forEach(result => {
+            // Skip results that are not movies or TV shows (e.g., people)
+            if (result.media_type && result.media_type !== 'movie' && result.media_type !== 'tv') {
+                return;
+            }
+            
+            const card = uiService.createMediaCard(result);
+            resultsContainer.appendChild(card);
         });
         
-        searchAutocomplete.appendChild(resultItem);
-    });
-    
-    searchAutocomplete.style.display = 'block';
-}
-
-function selectAutocompleteItem(items, index) {
-    // Remove selected class from all items
-    items.forEach(item => item.classList.remove('selected'));
-    
-    // Add selected class to the item at the specified index
-    items[index].classList.add('selected');
-    
-    // Optionally scroll into view if needed
-    items[index].scrollIntoView({ block: 'nearest' });
-}
-
-async function performSearch() {
-    const searchQuery = searchInput.value.trim();
-    
-    if (searchQuery.length === 0) {
-        return;
-    }
-    
-    // Hide autocomplete
-    searchAutocomplete.style.display = 'none';
-    
-    // Show search section
-    showSection('search');
-    
-    // Show loading state
-    document.getElementById('search-results').innerHTML = '<p>Searching for results...</p>';
-    
-    try {
-        const response = await fetch(`${TMDB_BASE_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}`);
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-            // Filter out person results and keep only movies and tv shows
-            const filteredResults = data.results.filter(item => 
-                item.media_type === 'movie' || item.media_type === 'tv'
-            );
-            
-            // Display search results
-            renderContentGrid('search-results', filteredResults);
-            
-            // Update section heading
-            document.querySelector('#search-section h2').textContent = `Search Results for "${searchQuery}"`;
+        // Show/hide load more button
+        if (state.currentPage >= state.totalPages) {
+            loadMoreButton.style.display = 'none';
         } else {
-            document.getElementById('search-results').innerHTML = '<p>No results found. Try a different search term.</p>';
+            loadMoreButton.style.display = 'block';
         }
+        
     } catch (error) {
-        console.error('Error during search:', error);
-        document.getElementById('search-results').innerHTML = '<p>Error during search. Please try again.</p>';
+        console.error('Error performing search:', error);
+        const resultsContainer = document.getElementById('search-results');
+        
+        if (state.currentPage === 1) {
+            uiService.showError(resultsContainer);
+        }
     }
-}
+};
 
-// Helper function to get media type icon and label
-function getMediaTypeInfo(mediaType) {
-    switch (mediaType) {
-        case 'movie':
-            return { icon: 'fa-film', label: 'Movie' };
-        case 'tv':
-            return { icon: 'fa-tv', label: 'TV Show' };
-        default:
-            return { icon: 'fa-question', label: 'Unknown' };
+/**
+ * Set up load more button
+ */
+const setupLoadMore = () => {
+    const loadMoreButton = document.getElementById('load-more');
+    
+    if (loadMoreButton) {
+        loadMoreButton.addEventListener('click', async () => {
+            state.currentPage++;
+            await performSearch();
+        });
     }
-}
+};
 
-// Helper function to escape special characters in a string for use in a regex
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+// Initialize the search page when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', initSearchPage); 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JustStream - Free Online Streaming</title>
+    <title>Movies - JustStream</title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/responsive.css">
@@ -22,8 +22,8 @@
                     <span class="bar"></span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li><a href="movies.html">Movies</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="movies.html" class="active">Movies</a></li>
                     <li><a href="tvshows.html">TV Shows</a></li>
                     <li class="search-container">
                         <input type="text" id="search-input" placeholder="Search...">
@@ -34,29 +34,32 @@
         </div>
     </nav>
 
+    <!-- Movies Header -->
+    <header class="page-header">
+        <h1>Movies</h1>
+        <div class="filter-container">
+            <select id="genre-filter" class="filter-select">
+                <option value="">All Genres</option>
+                <!-- Genre options will be added dynamically -->
+            </select>
+            <select id="sort-filter" class="filter-select">
+                <option value="popularity.desc">Most Popular</option>
+                <option value="vote_average.desc">Top Rated</option>
+                <option value="release_date.desc">Newest First</option>
+                <option value="release_date.asc">Oldest First</option>
+            </select>
+        </div>
+    </header>
+
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Trending Movies Section -->
-        <section class="content-section">
-            <h2 class="section-title">Trending Movies</h2>
-            <div class="media-scroll" id="trending-movies">
+        <!-- Movies Grid -->
+        <section class="media-grid-container">
+            <div class="media-grid" id="movies-grid">
                 <!-- Movie cards will be dynamically inserted here -->
             </div>
-        </section>
-
-        <!-- Top Rated Movies Section -->
-        <section class="content-section">
-            <h2 class="section-title">Top Rated Movies</h2>
-            <div class="media-scroll" id="top-rated-movies">
-                <!-- Movie cards will be dynamically inserted here -->
-            </div>
-        </section>
-
-        <!-- Popular TV Shows Section -->
-        <section class="content-section">
-            <h2 class="section-title">Popular TV Shows</h2>
-            <div class="media-scroll" id="popular-tvshows">
-                <!-- TV Show cards will be dynamically inserted here -->
+            <div class="load-more-container">
+                <button id="load-more" class="btn-secondary">Load More</button>
             </div>
         </section>
     </main>
@@ -79,6 +82,6 @@
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="js/ui.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/movies.js"></script>
 </body>
 </html> 

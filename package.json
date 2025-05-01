@@ -1,0 +1,25 @@
+{
+  "name": "juststream",
+  "version": "1.0.0",
+  "description": "A free online streaming platform for movies and TV shows",
+  "main": "serve.js",
+  "scripts": {
+    "start": "node serve.js",
+    "dev": "node serve.js"
+  },
+  "keywords": [
+    "streaming",
+    "movies",
+    "tv-shows",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 
