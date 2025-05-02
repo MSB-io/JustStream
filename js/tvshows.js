@@ -8,7 +8,10 @@ const state = {
     currentPage: 1,
     totalPages: 0,
     sortBy: 'popularity.desc',
-    genreId: null
+    genreId: null,
+    year: null,
+    language: null,
+    minRating: null
 };
 
 // Function to initialize the TV shows page
@@ -20,26 +23,33 @@ const initTVShowsPage = async () => {
         // Set genre filter if provided
         if (params.genre) {
             state.genreId = params.genre;
-            
-            // Update page title with genre name
-            try {
-                const genresData = await apiService.getTVGenres();
-                const genre = genresData.genres.find(g => g.id == params.genre);
-                
-                if (genre) {
-                    document.querySelector('.page-header h1').textContent = `${genre.name} TV Shows`;
-                    uiService.setPageTitle(`${genre.name} TV Shows`);
-                }
-            } catch (error) {
-                console.error('Error fetching genre name:', error);
-            }
         }
         
-        // Set up genre filter
-        await setupGenreFilter();
+        // Set year filter if provided
+        if (params.year) {
+            state.year = params.year;
+        }
         
-        // Set up sort filter
+        // Set language filter if provided
+        if (params.language) {
+            state.language = params.language;
+        }
+        
+        // Set rating filter if provided
+        if (params.rating) {
+            state.minRating = params.rating;
+        }
+        
+        // Update page title with filters if any are applied
+        updatePageTitle();
+        
+        // Set up filter dropdowns
+        await setupGenreFilter();
+        await setupYearFilter();
+        await setupLanguageFilter();
+        setupRatingFilter();
         setupSortFilter();
+        setupResetButton();
         
         // Load TV shows
         await loadTVShows();
@@ -53,6 +63,36 @@ const initTVShowsPage = async () => {
 };
 
 /**
+ * Update page title based on active filters
+ */
+const updatePageTitle = async () => {
+    let title = 'TV Shows';
+    
+    try {
+        // Add genre name to title if applicable
+        if (state.genreId) {
+            const genresData = await apiService.getTVGenres();
+            const genre = genresData.genres.find(g => g.id == state.genreId);
+            
+            if (genre) {
+                title = `${genre.name} TV Shows`;
+            }
+        }
+        
+        // Add year to title if applicable
+        if (state.year) {
+            title += ` (${state.year})`;
+        }
+        
+        // Update DOM and page title
+        document.querySelector('.page-header h1').textContent = title;
+        uiService.setPageTitle(`${title} - JustStream`);
+    } catch (error) {
+        console.error('Error updating page title:', error);
+    }
+};
+
+/**
  * Set up genre filter dropdown
  */
 const setupGenreFilter = async () => {
@@ -60,7 +100,7 @@ const setupGenreFilter = async () => {
         const genreFilter = document.getElementById('genre-filter');
         
         if (genreFilter) {
-            // Fetch all TV genres
+            // Fetch all TV show genres
             const genresData = await apiService.getTVGenres();
             
             // Add genre options to dropdown
@@ -81,27 +121,134 @@ const setupGenreFilter = async () => {
                 state.genreId = genreFilter.value || null;
                 state.currentPage = 1;
                 
-                // Update page title based on genre
-                if (state.genreId) {
-                    const genre = genresData.genres.find(g => g.id == state.genreId);
-                    if (genre) {
-                        document.querySelector('.page-header h1').textContent = `${genre.name} TV Shows`;
-                        uiService.setPageTitle(`${genre.name} TV Shows`);
-                    }
-                } else {
-                    document.querySelector('.page-header h1').textContent = 'TV Shows';
-                    uiService.setPageTitle('TV Shows - JustStream');
-                }
-                
-                // Reset and reload TV shows
-                const tvShowsGrid = document.getElementById('tvshows-grid');
-                tvShowsGrid.innerHTML = '';
-                
-                await loadTVShows();
+                // Update page title and reload TV shows
+                await updatePageTitle();
+                resetAndReloadTVShows();
             });
         }
     } catch (error) {
         console.error('Error setting up genre filter:', error);
+    }
+};
+
+/**
+ * Set up year filter dropdown
+ */
+const setupYearFilter = async () => {
+    try {
+        const yearFilter = document.getElementById('year-filter');
+        
+        if (yearFilter) {
+            // Add year options (current year down to 1900)
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear; year >= 1900; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            }
+            
+            // Set initial value from state if year was specified
+            if (state.year) {
+                yearFilter.value = state.year;
+            }
+            
+            // Add change event listener
+            yearFilter.addEventListener('change', async () => {
+                state.year = yearFilter.value || null;
+                state.currentPage = 1;
+                
+                // Update page title and reload TV shows
+                await updatePageTitle();
+                resetAndReloadTVShows();
+            });
+        }
+    } catch (error) {
+        console.error('Error setting up year filter:', error);
+    }
+};
+
+/**
+ * Set up language filter dropdown
+ */
+const setupLanguageFilter = async () => {
+    try {
+        const languageFilter = document.getElementById('language-filter');
+        
+        if (languageFilter) {
+            // Fetch all languages
+            const languagesData = await apiService.getLanguages();
+            
+            // Sort languages by English name
+            const sortedLanguages = languagesData.sort((a, b) => 
+                a.english_name.localeCompare(b.english_name)
+            );
+            
+            // Add language options to dropdown (most common first)
+            const commonLanguages = ['en', 'es', 'fr', 'de', 'ja', 'ko', 'zh', 'hi', 'ru'];
+            
+            // Add common languages first
+            commonLanguages.forEach(langCode => {
+                const language = sortedLanguages.find(l => l.iso_639_1 === langCode);
+                if (language) {
+                    const option = document.createElement('option');
+                    option.value = language.iso_639_1;
+                    option.textContent = language.english_name;
+                    languageFilter.appendChild(option);
+                }
+            });
+            
+            // Add a separator
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '──────────';
+            languageFilter.appendChild(separator);
+            
+            // Add all other languages
+            sortedLanguages.forEach(language => {
+                if (!commonLanguages.includes(language.iso_639_1)) {
+                    const option = document.createElement('option');
+                    option.value = language.iso_639_1;
+                    option.textContent = language.english_name;
+                    languageFilter.appendChild(option);
+                }
+            });
+            
+            // Set initial value from state if language was specified
+            if (state.language) {
+                languageFilter.value = state.language;
+            }
+            
+            // Add change event listener
+            languageFilter.addEventListener('change', () => {
+                state.language = languageFilter.value || null;
+                state.currentPage = 1;
+                resetAndReloadTVShows();
+            });
+        }
+    } catch (error) {
+        console.error('Error setting up language filter:', error);
+    }
+};
+
+/**
+ * Set up rating filter dropdown
+ */
+const setupRatingFilter = () => {
+    const ratingFilter = document.getElementById('rating-filter');
+    
+    if (ratingFilter) {
+        // Set initial value from state if rating was specified
+        if (state.minRating) {
+            ratingFilter.value = state.minRating;
+        }
+        
+        // Add change event listener
+        ratingFilter.addEventListener('change', () => {
+            state.minRating = ratingFilter.value || null;
+            state.currentPage = 1;
+            resetAndReloadTVShows();
+        });
     }
 };
 
@@ -116,17 +263,54 @@ const setupSortFilter = () => {
         sortFilter.value = state.sortBy;
         
         // Add change event listener
-        sortFilter.addEventListener('change', async () => {
+        sortFilter.addEventListener('change', () => {
             state.sortBy = sortFilter.value;
             state.currentPage = 1;
-            
-            // Reset and reload TV shows
-            const tvShowsGrid = document.getElementById('tvshows-grid');
-            tvShowsGrid.innerHTML = '';
-            
-            await loadTVShows();
+            resetAndReloadTVShows();
         });
     }
+};
+
+/**
+ * Set up reset button
+ */
+const setupResetButton = () => {
+    const resetButton = document.getElementById('filter-reset');
+    
+    if (resetButton) {
+        resetButton.addEventListener('click', async () => {
+            // Reset all filters
+            document.getElementById('genre-filter').value = '';
+            document.getElementById('year-filter').value = '';
+            document.getElementById('language-filter').value = '';
+            document.getElementById('rating-filter').value = '';
+            document.getElementById('sort-filter').value = 'popularity.desc';
+            
+            // Reset state
+            state.genreId = null;
+            state.year = null;
+            state.language = null;
+            state.minRating = null;
+            state.sortBy = 'popularity.desc';
+            state.currentPage = 1;
+            
+            // Update page title
+            document.querySelector('.page-header h1').textContent = 'TV Shows';
+            uiService.setPageTitle('TV Shows - JustStream');
+            
+            // Reload TV shows
+            resetAndReloadTVShows();
+        });
+    }
+};
+
+/**
+ * Reset TV shows grid and reload content
+ */
+const resetAndReloadTVShows = async () => {
+    const tvShowsGrid = document.getElementById('tvshows-grid');
+    tvShowsGrid.innerHTML = '';
+    await loadTVShows();
 };
 
 /**
@@ -142,30 +326,20 @@ const loadTVShows = async () => {
             uiService.showLoading(container);
         }
         
-        // Fetch TV shows based on filters
-        let tvShowsData;
+        // Create filters object for API call
+        const filters = {
+            sortBy: state.sortBy,
+            genreId: state.genreId,
+            year: state.year,
+            language: state.language,
+            minRating: state.minRating
+        };
         
-        if (state.genreId) {
-            // Fetch TV shows by genre
-            tvShowsData = await apiService.discoverTVShowsByGenre(
-                state.genreId,
-                state.sortBy,
-                state.currentPage
-            );
-        } else {
-            // Fetch TV shows based on sort option
-            if (state.sortBy === 'popularity.desc') {
-                tvShowsData = await apiService.getPopularTVShows(state.currentPage);
-            } else if (state.sortBy === 'vote_average.desc') {
-                tvShowsData = await apiService.getTopRatedTVShows(state.currentPage);
-            } else {
-                // Use discover for other sort options
-                tvShowsData = await apiService.fetchFromTMDB('/discover/tv', {
-                    sort_by: state.sortBy,
-                    page: state.currentPage
-                });
-            }
-        }
+        // Fetch TV shows with filters
+        const tvShowsData = await apiService.discoverTVShowsWithFilters(
+            filters,
+            state.currentPage
+        );
         
         // Update total pages
         state.totalPages = tvShowsData.total_pages;
@@ -173,6 +347,13 @@ const loadTVShows = async () => {
         // Clear container if it's the first page
         if (state.currentPage === 1) {
             container.innerHTML = '';
+        }
+        
+        // Check if there are any results
+        if (tvShowsData.results.length === 0 && state.currentPage === 1) {
+            container.innerHTML = '<div class="no-results">No TV shows found matching your filters. Try adjusting your criteria.</div>';
+            loadMoreButton.style.display = 'none';
+            return;
         }
         
         // Display TV shows

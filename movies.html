@@ -27,7 +27,13 @@
                     <li><a href="tvshows.html">TV Shows</a></li>
                     <li class="search-container">
                         <input type="text" id="search-input" placeholder="Search...">
-                        <button id="search-button"><i class="search-icon"></i></button>
+                        <div id="search-suggestions" class="search-suggestions"></div>
+                        <button id="search-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -42,12 +48,34 @@
                 <option value="">All Genres</option>
                 <!-- Genre options will be added dynamically -->
             </select>
+            
+            <select id="year-filter" class="filter-select">
+                <option value="">All Years</option>
+                <!-- Year options will be added dynamically -->
+            </select>
+            
+            <select id="language-filter" class="filter-select">
+                <option value="">All Languages</option>
+                <!-- Language options will be added dynamically -->
+            </select>
+            
+            <select id="rating-filter" class="filter-select">
+                <option value="">All Ratings</option>
+                <option value="9">9+ ★</option>
+                <option value="8">8+ ★</option>
+                <option value="7">7+ ★</option>
+                <option value="6">6+ ★</option>
+                <option value="5">5+ ★</option>
+            </select>
+            
             <select id="sort-filter" class="filter-select">
                 <option value="popularity.desc">Most Popular</option>
                 <option value="vote_average.desc">Top Rated</option>
                 <option value="release_date.desc">Newest First</option>
                 <option value="release_date.asc">Oldest First</option>
             </select>
+            
+            <button id="filter-reset" class="btn-secondary">Reset Filters</button>
         </div>
     </header>
 
@@ -68,11 +96,42 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-content">
-                <p>JustStream &copy; 2023. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
-                <div class="footer-links">
-                    <a href="#">About</a>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                <div class="footer-logo">
+                    <a href="index.html">JustStream</a>
+                </div>
+                <div class="footer-nav">
+                    <div class="footer-nav-section">
+                        <h4>Explore</h4>
+                        <ul>
+                            <li><a href="movies.html">Movies</a></li>
+                            <li><a href="tvshows.html">TV Shows</a></li>
+                            <li><a href="#">Top Rated</a></li>
+                            <li><a href="#">New Releases</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-nav-section">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Device Support</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-nav-section">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                            <li><a href="#">About Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="copyright">
+                        <p>&copy; 2023 JustStream. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+                    </div>
                 </div>
             </div>
         </div>

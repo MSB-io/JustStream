@@ -184,6 +184,7 @@ class UIService {
     initSearch() {
         const searchInput = document.getElementById('search-input');
         const searchButton = document.getElementById('search-button');
+        const searchSuggestions = document.getElementById('search-suggestions');
         
         if (searchInput && searchButton) {
             // Search on button click
@@ -203,6 +204,119 @@ class UIService {
                     }
                 }
             });
+
+            // Implement autocomplete/typeahead functionality
+            let typingTimer;
+            const doneTypingInterval = 300; // wait 300ms after user stops typing
+
+            // Listen for input changes for autocomplete
+            searchInput.addEventListener('input', () => {
+                clearTimeout(typingTimer);
+                
+                const query = searchInput.value.trim();
+                
+                // Clear suggestions if query is empty
+                if (!query) {
+                    searchSuggestions.innerHTML = '';
+                    searchSuggestions.classList.remove('active');
+                    return;
+                }
+                
+                // Set timer to fetch suggestions after typing stops
+                typingTimer = setTimeout(() => {
+                    this.fetchSearchSuggestions(query, searchSuggestions);
+                }, doneTypingInterval);
+            });
+
+            // Close suggestions when clicking outside
+            document.addEventListener('click', (event) => {
+                if (!searchInput.contains(event.target) && !searchSuggestions.contains(event.target)) {
+                    searchSuggestions.classList.remove('active');
+                }
+            });
+
+            // Show suggestions when focusing on input if there's a value
+            searchInput.addEventListener('focus', () => {
+                const query = searchInput.value.trim();
+                if (query && searchSuggestions.innerHTML !== '') {
+                    searchSuggestions.classList.add('active');
+                }
+            });
+        }
+    }
+
+    /**
+     * Fetch and display search suggestions
+     * @param {string} query - Search query
+     * @param {HTMLElement} suggestionsContainer - Container for suggestions
+     */
+    async fetchSearchSuggestions(query, suggestionsContainer) {
+        try {
+            const response = await apiService.getSearchSuggestions(query);
+            
+            // Filter results to only include movies and TV shows
+            const filteredResults = response.results
+                .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
+                .slice(0, 6); // Limit to 6 suggestions
+            
+            suggestionsContainer.innerHTML = '';
+            
+            // Add a header for suggestions
+            const header = document.createElement('div');
+            header.className = 'search-suggestions-header';
+            header.textContent = 'Search Results';
+            suggestionsContainer.appendChild(header);
+
+            if (filteredResults.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'search-suggestion-no-results';
+                noResults.textContent = 'No results found';
+                suggestionsContainer.appendChild(noResults);
+                suggestionsContainer.classList.add('active');
+                return;
+            }
+            
+            // Create suggestion items
+            filteredResults.forEach(item => {
+                const title = item.title || item.name || 'Unknown';
+                const year = item.release_date || item.first_air_date 
+                    ? new Date(item.release_date || item.first_air_date).getFullYear() 
+                    : '';
+                const mediaType = item.media_type === 'movie' ? 'Movie' : 'TV';
+                
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'search-suggestion-item';
+                suggestionItem.innerHTML = `
+                    <span class="media-type ${item.media_type}">${mediaType}</span>
+                    <span class="suggestion-title">${title}</span>
+                    ${year ? `<span class="suggestion-year">${year}</span>` : ''}
+                `;
+                
+                // Add click event to navigate to search result
+                suggestionItem.addEventListener('click', () => {
+                    window.location.href = getDetailsUrl(item.media_type, item.id);
+                });
+                
+                suggestionsContainer.appendChild(suggestionItem);
+            });
+            
+            // Add a footer to see all results
+            if (response.total_results > filteredResults.length) {
+                const footer = document.createElement('div');
+                footer.className = 'search-suggestions-footer';
+                footer.innerHTML = `See all results for "<span>${query}</span>"`;
+                footer.addEventListener('click', () => {
+                    window.location.href = getSearchUrl(query);
+                });
+                suggestionsContainer.appendChild(footer);
+            }
+            
+            // Show suggestions container
+            suggestionsContainer.classList.add('active');
+            
+        } catch (error) {
+            console.error('Error fetching search suggestions:', error);
+            suggestionsContainer.classList.remove('active');
         }
     }
 
@@ -219,9 +333,11 @@ class UIService {
         
         if (hours === 0) {
             return `${mins}m`;
+        } else if (mins === 0) {
+            return `${hours}h`;
+        } else {
+            return `${hours}h ${mins}m`;
         }
-        
-        return `${hours}h ${mins}m`;
     }
 
     /**
@@ -233,11 +349,9 @@ class UIService {
         if (!dateString) return 'N/A';
         
         const date = new Date(dateString);
-        return date.toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        
+        return date.toLocaleDateString('en-US', options);
     }
 
     /**
@@ -245,7 +359,7 @@ class UIService {
      * @param {string} title - Page title
      */
     setPageTitle(title) {
-        document.title = `${title} - JustStream`;
+        document.title = title;
     }
 }
 

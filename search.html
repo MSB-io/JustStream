@@ -27,7 +27,13 @@
                     <li><a href="tvshows.html">TV Shows</a></li>
                     <li class="search-container">
                         <input type="text" id="search-input" placeholder="Search...">
-                        <button id="search-button"><i class="search-icon"></i></button>
+                        <div id="search-suggestions" class="search-suggestions"></div>
+                        <button id="search-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -36,10 +42,10 @@
 
     <!-- Search Results Header -->
     <header class="page-header">
-        <h1>Search Results for: <span id="search-query"></span></h1>
+        <h1>Search Results for "<span id="search-query"></span>"</h1>
         <div class="filter-container">
             <select id="filter-type" class="filter-select">
-                <option value="all">All Results</option>
+                <option value="all">All Types</option>
                 <option value="movie">Movies Only</option>
                 <option value="tv">TV Shows Only</option>
             </select>
@@ -51,14 +57,14 @@
         <!-- Search Results Grid -->
         <section class="media-grid-container">
             <div class="media-grid" id="search-results">
-                <!-- Search result cards will be dynamically inserted here -->
+                <!-- Media cards will be dynamically inserted here -->
+            </div>
+            <div id="no-results" class="no-results" style="display: none;">
+                <h2>No Results Found</h2>
+                <p>We couldn't find anything matching your search. Try different keywords.</p>
             </div>
             <div class="load-more-container">
                 <button id="load-more" class="btn-secondary">Load More</button>
-            </div>
-            <div class="no-results" id="no-results" style="display: none;">
-                <h2>No results found</h2>
-                <p>Try different keywords or check your spelling.</p>
             </div>
         </section>
     </main>
@@ -67,11 +73,42 @@
     <footer class="footer">
         <div class="footer-inner">
             <div class="footer-content">
-                <p>JustStream &copy; 2023. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
-                <div class="footer-links">
-                    <a href="#">About</a>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                <div class="footer-logo">
+                    <a href="index.html">JustStream</a>
+                </div>
+                <div class="footer-nav">
+                    <div class="footer-nav-section">
+                        <h4>Explore</h4>
+                        <ul>
+                            <li><a href="movies.html">Movies</a></li>
+                            <li><a href="tvshows.html">TV Shows</a></li>
+                            <li><a href="#">Top Rated</a></li>
+                            <li><a href="#">New Releases</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-nav-section">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Device Support</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-nav-section">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                            <li><a href="#">About Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <div class="copyright">
+                        <p>&copy; 2023 JustStream. This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+                    </div>
                 </div>
             </div>
         </div>

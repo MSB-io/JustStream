@@ -254,7 +254,7 @@ class ApiService {
      * @returns {Promise} - Fetch promise
      */
     discoverMoviesByGenre(genreId, sortBy = 'popularity.desc', page = 1) {
-        return this.fetchFromTMDB('/discover/movie', { 
+        return this.fetchFromTMDB('/discover/movie', {
             with_genres: genreId,
             sort_by: sortBy,
             page
@@ -269,10 +269,123 @@ class ApiService {
      * @returns {Promise} - Fetch promise
      */
     discoverTVShowsByGenre(genreId, sortBy = 'popularity.desc', page = 1) {
-        return this.fetchFromTMDB('/discover/tv', { 
+        return this.fetchFromTMDB('/discover/tv', {
             with_genres: genreId,
             sort_by: sortBy,
             page
+        });
+    }
+
+    /**
+     * Discovers movies with advanced filters
+     * @param {Object} filters - Filter options
+     * @param {number} page - Page number
+     * @returns {Promise} - Fetch promise
+     */
+    discoverMoviesWithFilters(filters = {}, page = 1) {
+        const params = {
+            page,
+            sort_by: filters.sortBy || 'popularity.desc'
+        };
+
+        // Add genre filter if provided
+        if (filters.genreId) {
+            params.with_genres = filters.genreId;
+        }
+
+        // Add year filter if provided
+        if (filters.year) {
+            params.primary_release_year = filters.year;
+        }
+        
+        // Add year range filter if provided
+        if (filters.startYear) {
+            params.primary_release_date_gte = `${filters.startYear}-01-01`;
+        }
+        if (filters.endYear) {
+            params.primary_release_date_lte = `${filters.endYear}-12-31`;
+        }
+
+        // Add language filter if provided
+        if (filters.language) {
+            params.with_original_language = filters.language;
+        }
+
+        // Add vote average (rating) filter if provided
+        if (filters.minRating) {
+            params.vote_average_gte = filters.minRating;
+        }
+        if (filters.maxRating) {
+            params.vote_average_lte = filters.maxRating;
+        }
+
+        return this.fetchFromTMDB('/discover/movie', params);
+    }
+
+    /**
+     * Discovers TV shows with advanced filters
+     * @param {Object} filters - Filter options
+     * @param {number} page - Page number
+     * @returns {Promise} - Fetch promise
+     */
+    discoverTVShowsWithFilters(filters = {}, page = 1) {
+        const params = {
+            page,
+            sort_by: filters.sortBy || 'popularity.desc'
+        };
+
+        // Add genre filter if provided
+        if (filters.genreId) {
+            params.with_genres = filters.genreId;
+        }
+
+        // Add year filter if provided
+        if (filters.year) {
+            params.first_air_date_year = filters.year;
+        }
+        
+        // Add year range filter if provided
+        if (filters.startYear) {
+            params.first_air_date_gte = `${filters.startYear}-01-01`;
+        }
+        if (filters.endYear) {
+            params.first_air_date_lte = `${filters.endYear}-12-31`;
+        }
+
+        // Add language filter if provided
+        if (filters.language) {
+            params.with_original_language = filters.language;
+        }
+
+        // Add vote average (rating) filter if provided
+        if (filters.minRating) {
+            params.vote_average_gte = filters.minRating;
+        }
+        if (filters.maxRating) {
+            params.vote_average_lte = filters.maxRating;
+        }
+
+        return this.fetchFromTMDB('/discover/tv', params);
+    }
+
+    /**
+     * Fetch languages available in TMDB
+     * @returns {Promise} - Fetch promise
+     */
+    getLanguages() {
+        return this.fetchFromTMDB('/configuration/languages');
+    }
+
+    /**
+     * Search suggestions for autocomplete
+     * @param {string} query - Search query
+     * @returns {Promise} - Fetch promise with first page of results to use for suggestions
+     */
+    getSearchSuggestions(query) {
+        return this.fetchFromTMDB('/search/multi', { 
+            query, 
+            page: 1,
+            include_adult: false
         });
     }
 }
