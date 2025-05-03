@@ -361,16 +361,6 @@ ul {
     display: inline-block;
 }
 
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 50px;
-    height: 3px;
-    background-color: var(--white);
-}
-
 /* Content Sections */
 .content-section {
     margin-bottom: var(--spacing-xxl);
