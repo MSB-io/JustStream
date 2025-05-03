@@ -39,73 +39,21 @@
 
     .media-card {
         min-width: 140px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-
-    .media-poster {
-        height: 210px;
+    
+    .media-card:hover {
+        transform: translateY(-5px);
     }
-
-    .details-content {
-        padding: var(--spacing-md);
-    }
-
-    .actions {
-        flex-direction: column;
-        gap: var(--spacing-sm);
-        width: 100%;
-        align-items: stretch;
-    }
-
+    
     .btn-primary, .btn-secondary {
-        width: 100%;
-        min-width: unset;
-        justify-content: center;
-    }
-
-    .episode-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .episode-thumbnail {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16/9;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .cast-photo {
-        width: 80px;
-        height: 80px;
-    }
-
-    .footer-content {
-        padding: var(--spacing-md);
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
     }
     
-    .footer-logo {
-        text-align: center;
-    }
-    
-    .footer-nav {
-        flex-direction: column;
-        gap: var(--spacing-lg);
-    }
-    
-    .footer-nav-section {
-        text-align: center;
-    }
-    
-    .footer-nav-section a:hover {
-        transform: none;
-    }
-    
-    .watch-container {
-        padding: var(--spacing-md);
-    }
-    
-    .watch-header h1 {
-        font-size: 1.5rem;
+    .footer-nav-section h4::after {
+        left: 50%;
+        transform: translateX(-50%);
     }
 }
 
@@ -292,4 +240,4 @@
     .media-card:hover {
         transform: none;
     }
-} 
+}
