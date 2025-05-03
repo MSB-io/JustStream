@@ -43,11 +43,31 @@
         </div>
     </nav>
 
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+        <div class="hero-banner-background">
+            <!-- Background image will be set via JavaScript -->
+        </div>
+        <div class="hero-banner-inner">
+            <div class="hero-content">
+                <h1>Unlimited Movies & TV Shows</h1>
+                <p>Stream your favorite content anytime, anywhere. The best streaming experience with JustStream.</p>
+                <div class="hero-buttons">
+                    <a href="movies.html" class="btn-primary">Explore Movies</a>
+                    <a href="tvshows.html" class="btn-secondary">Browse TV Shows</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Main Content -->
     <main class="main-content">
         <!-- Trending Movies Section -->
         <section class="content-section">
-            <h2 class="section-title">Trending Movies</h2>
+            <div class="section-header">
+                <h2 class="section-title">Trending Movies</h2>
+                <a href="movies.html?sort=trending" class="view-all">View All</a>
+            </div>
             <div class="media-scroll" id="trending-movies">
                 <!-- Movie cards will be dynamically inserted here -->
             </div>
@@ -55,7 +75,10 @@
 
         <!-- Top Rated Movies Section -->
         <section class="content-section">
-            <h2 class="section-title">Top Rated Movies</h2>
+            <div class="section-header">
+                <h2 class="section-title">Top Rated Movies</h2>
+                <a href="movies.html?sort=top_rated" class="view-all">View All</a>
+            </div>
             <div class="media-scroll" id="top-rated-movies">
                 <!-- Movie cards will be dynamically inserted here -->
             </div>
@@ -63,9 +86,43 @@
 
         <!-- Popular TV Shows Section -->
         <section class="content-section">
-            <h2 class="section-title">Popular TV Shows</h2>
+            <div class="section-header">
+                <h2 class="section-title">Popular TV Shows</h2>
+                <a href="tvshows.html?sort=popular" class="view-all">View All</a>
+            </div>
             <div class="media-scroll" id="popular-tvshows">
                 <!-- TV Show cards will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <!-- Featured Categories -->
+        <section class="content-section categories-section">
+            <h2 class="section-title">Featured Categories</h2>
+            <div class="categories-grid">
+                <a href="movies.html?genre=28" class="category-card">
+                    <div class="category-icon">🎬</div>
+                    <h3>Action</h3>
+                </a>
+                <a href="movies.html?genre=35" class="category-card">
+                    <div class="category-icon">😂</div>
+                    <h3>Comedy</h3>
+                </a>
+                <a href="movies.html?genre=27" class="category-card">
+                    <div class="category-icon">😱</div>
+                    <h3>Horror</h3>
+                </a>
+                <a href="movies.html?genre=10749" class="category-card">
+                    <div class="category-icon">❤️</div>
+                    <h3>Romance</h3>
+                </a>
+                <a href="movies.html?genre=878" class="category-card">
+                    <div class="category-icon">🚀</div>
+                    <h3>Sci-Fi</h3>
+                </a>
+                <a href="movies.html?genre=16" class="category-card">
+                    <div class="category-icon">🧸</div>
+                    <h3>Animation</h3>
+                </a>
             </div>
         </section>
     </main>
@@ -83,8 +140,8 @@
                         <ul>
                             <li><a href="movies.html">Movies</a></li>
                             <li><a href="tvshows.html">TV Shows</a></li>
-                            <li><a href="#">Top Rated</a></li>
-                            <li><a href="#">New Releases</a></li>
+                            <li><a href="movies.html?sort=top_rated">Top Rated</a></li>
+                            <li><a href="movies.html?sort=release_date.desc">New Releases</a></li>
                         </ul>
                     </div>
                     <div class="footer-nav-section">
