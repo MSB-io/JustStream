@@ -116,6 +116,22 @@ const loadTVShow = async (tvId) => {
  */
 const loadVideoPlayer = (mediaType, mediaId, seasonNumber = null, episodeNumber = null) => {
     const playerContainer = document.getElementById('player-container');
+    
+    // Create source selector
+    const sourceSelector = document.createElement('div');
+    sourceSelector.className = 'source-selector';
+    sourceSelector.innerHTML = `
+        <div class="source-selector-inner">
+            <span>Source:</span>
+            <select id="video-source">
+                <option value="vip" selected>VIP Player</option>
+                <option value="multiembed">Multiembed</option>
+                <option value="vidsrc">VidSrc</option>
+            </select>
+        </div>
+    `;
+    
+    // Create iframe
     const iframe = document.createElement('iframe');
     
     // Set iframe attributes
@@ -127,16 +143,51 @@ const loadVideoPlayer = (mediaType, mediaId, seasonNumber = null, episodeNumber 
     iframe.style.width = '100%';
     iframe.style.height = '100%';
     
-    // Set source URL based on media type
-    if (mediaType === 'movie') {
-        iframe.src = getVidSrcUrl('movie', mediaId);
-    } else if (mediaType === 'tv') {
-        iframe.src = `${getVidSrcUrl('tv', mediaId)}/${seasonNumber}/${episodeNumber}`;
+    // Set initial source URL to VIP player (now the default)
+    let url = `${CONFIG.multiembed.baseUrl}?video_id=${mediaId}`;
+    
+    // Add tmdb parameter if using TMDB ID (default in our app)
+    url += '&tmdb=1';
+    
+    // Add season and episode for TV shows
+    if (mediaType === 'tv' && seasonNumber && episodeNumber) {
+        url += `&s=${seasonNumber}&e=${episodeNumber}`;
     }
     
-    // Clear container and append iframe
+    iframe.src = url;
+    
+    // Clear container and append elements
     playerContainer.innerHTML = '';
+    playerContainer.appendChild(sourceSelector);
     playerContainer.appendChild(iframe);
+    
+    // Add event listener to source selector
+    document.getElementById('video-source').addEventListener('change', (e) => {
+        const source = e.target.value;
+        
+        if (source === 'vidsrc') {
+            if (mediaType === 'movie') {
+                iframe.src = getVidSrcUrl('movie', mediaId);
+            } else if (mediaType === 'tv') {
+                iframe.src = `${getVidSrcUrl('tv', mediaId)}/${seasonNumber}/${episodeNumber}`;
+            }
+        } else if (source === 'multiembed') {
+            iframe.src = getMultiembedUrl(mediaType, mediaId, seasonNumber, episodeNumber);
+        } else if (source === 'vip') {
+            // Use VIP player option (without tmdb=1 for IMDB IDs)
+            let url = `${CONFIG.multiembed.baseUrl}?video_id=${mediaId}`;
+            
+            // Add tmdb parameter if using TMDB ID (default in our app)
+            url += '&tmdb=1';
+            
+            // Add season and episode for TV shows
+            if (mediaType === 'tv' && seasonNumber && episodeNumber) {
+                url += `&s=${seasonNumber}&e=${episodeNumber}`;
+            }
+            
+            iframe.src = url;
+        }
+    });
 };
 
 /**
@@ -239,4 +290,4 @@ const initBackButton = (mediaType, mediaId) => {
 };
 
 // Initialize the watch page when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initWatchPage); 
+document.addEventListener('DOMContentLoaded', initWatchPage);

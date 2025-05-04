@@ -17,6 +17,11 @@ const CONFIG = {
     // VidSrc Configuration for embedding videos
     vidsrc: {
         baseUrl: 'https://vidsrc.to/embed',
+    },
+    
+    // Multiembed Configuration for embedding videos
+    multiembed: {
+        baseUrl: 'https://multiembed.mov/directstream.php',
     }
 };
 
@@ -56,4 +61,30 @@ const getSearchUrl = (query) => {
 // VidSrc embed URL builder
 const getVidSrcUrl = (mediaType, id) => {
     return `${CONFIG.vidsrc.baseUrl}/${mediaType}/${id}`;
-}; 
+};
+
+// Multiembed URL builder
+const getMultiembedUrl = (mediaType, id, seasonNumber = null, episodeNumber = null, options = {}) => {
+    // Base URL with video ID
+    let url = `${CONFIG.multiembed.baseUrl}?video_id=${id}`;
+    
+    // Add tmdb parameter if using TMDB ID (default in our app)
+    url += '&tmdb=1';
+    
+    // Add season and episode for TV shows
+    if (mediaType === 'tv' && seasonNumber && episodeNumber) {
+        url += `&s=${seasonNumber}&e=${episodeNumber}`;
+    }
+    
+    // Add check parameter if needed
+    if (options.check) {
+        url += '&check=1';
+    }
+    
+    // Add custom subtitles if provided
+    if (options.subtitles) {
+        url += `&sub_url=${encodeURIComponent(options.subtitles.url)}&sub_label=${encodeURIComponent(options.subtitles.label)}`;
+    }
+    
+    return url;
+};
