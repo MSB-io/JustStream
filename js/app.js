@@ -15,6 +15,9 @@ const initHomePage = async () => {
         // Load popular TV shows
         await loadPopularTVShows();
         
+        // Load continue watching section
+        loadContinueWatching();
+        
     } catch (error) {
         console.error('Error initializing home page:', error);
     }
@@ -107,5 +110,100 @@ const loadPopularTVShows = async () => {
     }
 };
 
+/**
+ * Load continue watching section
+ */
+const loadContinueWatching = () => {
+    try {
+        const container = document.getElementById('continue-watching');
+        const section = document.getElementById('continue-watching-section');
+        const noHistoryMessage = document.getElementById('no-history-message');
+        
+        // Get watched history from localStorage
+        const watchHistory = getWatchHistory();
+        
+        // Clear container
+        container.innerHTML = '';
+        
+        // If no watch history, show message and hide section
+        if (watchHistory.length === 0) {
+            container.style.display = 'none';
+            noHistoryMessage.style.display = 'block';
+        } else {
+            container.style.display = 'flex';
+            noHistoryMessage.style.display = 'none';
+            
+            // Display watched items (most recent first)
+            watchHistory.slice(0, 10).forEach(item => {
+                const card = createWatchHistoryCard(item);
+                container.appendChild(card);
+            });
+        }
+        
+        // Add event listener to clear history button
+        const clearButton = document.getElementById('clear-history');
+        clearButton.addEventListener('click', () => {
+            clearWatchHistory();
+            loadContinueWatching(); // Reload the section
+        });
+        
+    } catch (error) {
+        console.error('Error loading continue watching section:', error);
+    }
+};
+
+/**
+ * Creates a media card for watch history items
+ * @param {Object} item - Watch history item
+ * @returns {HTMLElement} - Media card element
+ */
+const createWatchHistoryCard = (item) => {
+    // Create card element
+    const card = document.createElement('div');
+    card.className = 'media-card';
+    card.dataset.id = item.id;
+    card.dataset.type = item.mediaType;
+    
+    // Add click event to navigate to watch page directly
+    card.addEventListener('click', () => {
+        window.location.href = getWatchUrl(item.mediaType, item.id);
+    });
+
+    // Set card content with poster, title, year, and rating
+    card.innerHTML = `
+        <div class="media-poster">
+            <img src="${item.posterUrl}" alt="${item.title}" loading="lazy">
+            <div class="watch-progress">
+                <div class="progress-bar" style="width: ${item.progress || '0%'}"></div>
+            </div>
+        </div>
+        <div class="media-info">
+            <div class="media-title">${item.title}</div>
+            <div class="media-meta">
+                <span class="media-year">${item.year || 'N/A'}</span>
+                <span class="media-rating">${item.rating || 'N/A'}</span>
+            </div>
+        </div>
+    `;
+
+    return card;
+};
+
+/**
+ * Get watch history from localStorage
+ * @returns {Array} - Array of watched items
+ */
+const getWatchHistory = () => {
+    const history = localStorage.getItem('watchHistory');
+    return history ? JSON.parse(history) : [];
+};
+
+/**
+ * Clear watch history
+ */
+const clearWatchHistory = () => {
+    localStorage.removeItem('watchHistory');
+};
+
 // Initialize the home page when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initHomePage); 
+document.addEventListener('DOMContentLoaded', initHomePage);

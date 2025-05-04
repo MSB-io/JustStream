@@ -62,6 +62,21 @@
 
     <!-- Main Content -->
     <main class="main-content">
+
+        <!-- Continue Watching Section -->
+        <section class="content-section" id="continue-watching-section">
+            <div class="section-header">
+                <h2 class="section-title">Continue Watching</h2>
+                <button id="clear-history" class="btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;">Clear History</button>
+            </div>
+            <div class="media-scroll" id="continue-watching">
+                <!-- Recently watched content will be dynamically inserted here -->
+            </div>
+            <div id="no-history-message" style="display: none; text-align: center; padding: 2rem;">
+                <p>You haven't watched any content yet. Start watching to see your history here!</p>
+            </div>
+        </section>
+
         <!-- Trending Movies Section -->
         <section class="content-section">
             <div class="section-header">
@@ -95,38 +110,6 @@
             </div>
         </section>
 
-        <!-- Featured Categories - Updated to match other sections -->
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title">Featured Categories</h2>
-            </div>
-            <div class="categories-grid">
-                <a href="movies.html?genre=28" class="category-card">
-                    <div class="category-icon">🎬</div>
-                    <h3>Action</h3>
-                </a>
-                <a href="movies.html?genre=35" class="category-card">
-                    <div class="category-icon">😂</div>
-                    <h3>Comedy</h3>
-                </a>
-                <a href="movies.html?genre=27" class="category-card">
-                    <div class="category-icon">😱</div>
-                    <h3>Horror</h3>
-                </a>
-                <a href="movies.html?genre=10749" class="category-card">
-                    <div class="category-icon">❤️</div>
-                    <h3>Romance</h3>
-                </a>
-                <a href="movies.html?genre=878" class="category-card">
-                    <div class="category-icon">🚀</div>
-                    <h3>Sci-Fi</h3>
-                </a>
-                <a href="movies.html?genre=16" class="category-card">
-                    <div class="category-icon">🧸</div>
-                    <h3>Animation</h3>
-                </a>
-            </div>
-        </section>
     </main>
 
     <!-- Footer -->

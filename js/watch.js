@@ -50,6 +50,9 @@ const loadMovie = async (movieId) => {
         // Fetch movie details
         const movie = await apiService.getMovieDetails(movieId);
         
+        // Store movie details globally for later use
+        window.currentMovie = movie;
+        
         // Update page title
         uiService.setPageTitle(`Watch ${movie.title}`);
         
@@ -78,6 +81,9 @@ const loadTVShow = async (tvId) => {
     try {
         // Fetch TV show details
         const tvShow = await apiService.getTVDetails(tvId);
+        
+        // Store TV show details globally for later use
+        window.currentTVShow = tvShow;
         
         // Update page title
         uiService.setPageTitle(`Watch ${tvShow.name}`);
@@ -188,6 +194,57 @@ const loadVideoPlayer = (mediaType, mediaId, seasonNumber = null, episodeNumber 
             iframe.src = url;
         }
     });
+    
+    // Add to watch history when video loads
+    setTimeout(() => {
+        // Get the current media data
+        let mediaData;
+        if (mediaType === 'movie') {
+            // For movies
+            const title = document.getElementById('watch-title').textContent;
+            const year = document.getElementById('watch-year').textContent;
+            const rating = document.getElementById('watch-rating').textContent.split('/')[0];
+            
+            // Get poster path from the global movie object
+            // This assumes loadMovie function has stored the movie details
+            const posterPath = window.currentMovie ? window.currentMovie.poster_path : null;
+            
+            mediaData = {
+                id: mediaId,
+                mediaType: mediaType,
+                title: title,
+                poster_path: posterPath,
+                year: year,
+                rating: rating,
+                progress: '10%' // Default progress
+            };
+        } else {
+            // For TV shows
+            const title = document.getElementById('watch-title').textContent;
+            const year = document.getElementById('watch-year').textContent;
+            const rating = document.getElementById('watch-rating').textContent.split('/')[0];
+            
+            // Get poster path from the global tvShow object
+            // This assumes loadTVShow function has stored the TV show details
+            const posterPath = window.currentTVShow ? window.currentTVShow.poster_path : null;
+            
+            mediaData = {
+                id: mediaId,
+                mediaType: mediaType,
+                title: `${title} S${seasonNumber}E${episodeNumber}`,
+                poster_path: posterPath,
+                year: year,
+                rating: rating,
+                progress: '10%', // Default progress
+                seasonNumber: seasonNumber,
+                episodeNumber: episodeNumber
+            };
+        }
+        
+        // Add to watch history
+        addToWatchHistory(mediaData);
+        
+    }, 3000); // Wait 3 seconds to ensure the video has started loading
 };
 
 /**
@@ -291,3 +348,73 @@ const initBackButton = (mediaType, mediaId) => {
 
 // Initialize the watch page when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', initWatchPage);
+
+
+// Add this function to your watch.js file
+
+/**
+ * Add item to watch history
+ * @param {Object} mediaData - Media data object
+ */
+const addToWatchHistory = (mediaData) => {
+    // Get current watch history
+    const history = localStorage.getItem('watchHistory');
+    let watchHistory = history ? JSON.parse(history) : [];
+    
+    // Check if item already exists in history
+    const existingIndex = watchHistory.findIndex(item => 
+        item.id === mediaData.id && item.mediaType === mediaData.mediaType
+    );
+    
+    // If it's a TV show with episode info, check for the specific episode
+    if (mediaData.mediaType === 'tv' && mediaData.seasonNumber && mediaData.episodeNumber) {
+        const existingEpisodeIndex = watchHistory.findIndex(item => 
+            item.id === mediaData.id && 
+            item.mediaType === mediaData.mediaType &&
+            item.seasonNumber === mediaData.seasonNumber &&
+            item.episodeNumber === mediaData.episodeNumber
+        );
+        
+        if (existingEpisodeIndex !== -1) {
+            watchHistory.splice(existingEpisodeIndex, 1);
+        }
+    } else if (existingIndex !== -1) {
+        watchHistory.splice(existingIndex, 1);
+    }
+    
+    // Create history item
+    const historyItem = {
+        id: mediaData.id,
+        mediaType: mediaData.mediaType,
+        title: mediaData.title,
+        posterUrl: mediaData.poster_path ? 
+            `https://image.tmdb.org/t/p/w500${mediaData.poster_path}` : 
+            'https://via.placeholder.com/300x450?text=No+Image',
+        year: mediaData.year,
+        rating: mediaData.rating,
+        progress: mediaData.progress || '10%',
+        timestamp: Date.now()
+    };
+    
+    // Add season and episode info for TV shows
+    if (mediaData.mediaType === 'tv' && mediaData.seasonNumber && mediaData.episodeNumber) {
+        historyItem.seasonNumber = mediaData.seasonNumber;
+        historyItem.episodeNumber = mediaData.episodeNumber;
+    }
+    
+    // Add to beginning of array (most recent first)
+    watchHistory.unshift(historyItem);
+    
+    // Limit history to 20 items
+    if (watchHistory.length > 20) {
+        watchHistory = watchHistory.slice(0, 20);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('watchHistory', JSON.stringify(watchHistory));
+    
+    console.log('Added to watch history:', historyItem);
+};
+
+// Call this function when the video starts playing
+// For example, add this to your initPlayer function
